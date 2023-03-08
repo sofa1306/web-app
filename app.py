@@ -1,20 +1,25 @@
 from flask import Flask
-import PySimpleGUIWeb as sg
+from flask import request
 
-app = Flask(__name__)    
+app = Flask(__name__)
 
-@app.route('/')
-def hello_world():    
-    layout = [[sg.Text('demo')],      
-                     [sg.Text("name"),sg.InputText()],
-                     [sg.Text("age"),sg.InputText()],
-                     [sg.Text("tall"),sg.InputText()],
-                     [sg.Submit(), sg.Cancel()]]      
+@app.route("/")
+def index():
+    celsius = request.args.get("celsius", "")
+    return (
+        """<form action="" method="get">
+                <input type="text" name="celsius">
+                <input type="submit" value="Convert">
+            </form>"""
+        + celsius
+    )
 
-    window = sg.Window('Window Title', layout)    
+@app.route("/<int:celsius>")
+def fahrenheit_from(celsius):
+    """Convert Celsius to Fahrenheit degrees."""
+    fahrenheit = float(celsius) * 9 / 5 + 32
+    fahrenheit = round(fahrenheit, 3)  # Round to three decimal places
+    return str(fahrenheit)
 
-    event, values = window.read()    
-    window.close()
-
-    text_input = values[0], values[1], values[2]
-    sg.popup('Your info', text_input)
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=8080, debug=True)
